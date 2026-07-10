@@ -4,9 +4,19 @@ data:text/html;charset=utf-8,
 <body>
 <script>
 (function() {
-    const inputStr = "VOICE_INPUT_PLACEHOLDER";
-    let text = inputStr.toLowerCase().trim();
+    // Extract query string parameters directly from the browser window URL address bar
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryInput = urlParams.get('q');
     
+    // Halt execution if no query path parameter is supplied
+    if (!queryInput) {
+        outputRaw("Error: Missing query parameter (?q=)");
+        return;
+    }
+
+    let text = queryInput.toLowerCase().trim();
+    
+    // --- 1. MATHEMATICAL COMPUTATION SUB-ROUTINE ---
     let mathClean = text.replace(/plus/g, '+').replace(/minus/g, '-').replace(/times/g, '*').replace(/divided by/g, '/').replace(/x/g, '*').replace(/[^0-9\+\-\*\/\(\)\.]/g, '');
     if (/^[0-9\+\-\*\/\(\)\.]+$/.test(mathClean) && mathClean.length > 0) {
         try {
@@ -14,6 +24,7 @@ data:text/html;charset=utf-8,
         } catch(e) {}
     }
 
+    // --- 2. KEYWORD INDEX MATCHING PIPELINE ---
     let words = text.replace(/[^\w\s]/g, "").split(/\s+/);
     function has(w) { return words.indexOf(w) !== -1; }
     function order(w1, w2) { return words.indexOf(w1) < words.indexOf(w2); }
@@ -36,7 +47,8 @@ data:text/html;charset=utf-8,
         }
     }
 
-    let googleUrl = "https://google.com" + encodeURIComponent(inputStr);
+    // --- 3. GOOGLE ENGINE TEXT EXTRACTION THREAD ---
+    let googleUrl = "https://google.com" + encodeURIComponent(queryInput);
     let xhr = new XMLHttpRequest();
     xhr.open("GET", googleUrl, true);
     xhr.setRequestHeader("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1");
@@ -61,6 +73,7 @@ data:text/html;charset=utf-8,
     xhr.onerror = function() { outputRaw(googleUrl); };
     xhr.send();
 
+    // Writes raw string response directly onto the document screen
     function outputRaw(resultText) {
         document.open();
         document.write(resultText);
