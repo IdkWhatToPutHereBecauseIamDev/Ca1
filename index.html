@@ -1,0 +1,72 @@
+data:text/html;charset=utf-8,
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+(function() {
+    const inputStr = "VOICE_INPUT_PLACEHOLDER";
+    let text = inputStr.toLowerCase().trim();
+    
+    let mathClean = text.replace(/plus/g, '+').replace(/minus/g, '-').replace(/times/g, '*').replace(/divided by/g, '/').replace(/x/g, '*').replace(/[^0-9\+\-\*\/\(\)\.]/g, '');
+    if (/^[0-9\+\-\*\/\(\)\.]+$/.test(mathClean) && mathClean.length > 0) {
+        try {
+            outputRaw(eval(mathClean)); return;
+        } catch(e) {}
+    }
+
+    let words = text.replace(/[^\w\s]/g, "").split(/\s+/);
+    function has(w) { return words.indexOf(w) !== -1; }
+    function order(w1, w2) { return words.indexOf(w1) < words.indexOf(w2); }
+
+    if (has("what") && has("time") && order("what", "time")) {
+        outputRaw(new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})); return;
+    }
+    if (has("what") && has("date") && order("what", "date")) {
+        outputRaw(new Date().toLocaleDateString()); return;
+    }
+
+    let localKeywords = {
+        "status": "online",
+        "hello": "hello",
+        "hi": "hi"
+    };
+    for (let word of words) {
+        if (localKeywords[word]) {
+            outputRaw(localKeywords[word]); return;
+        }
+    }
+
+    let googleUrl = "https://google.com" + encodeURIComponent(inputStr);
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", googleUrl, true);
+    xhr.setRequestHeader("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1");
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(xhr.responseText, "text/html");
+            let snippet = doc.querySelector(".VwiC3b, .kno-rscr, .Z0LcW, .rLBo3f, .hgKElc, [data-attrid='wa:'], .MUwG0b");
+            
+            if (snippet && snippet.innerText.trim().length > 0) {
+                let ans = snippet.innerText.trim();
+                if (ans.length > 150) ans = ans.substring(0, 145) + "...";
+                outputRaw(ans);
+            } else {
+                outputRaw(googleUrl);
+            }
+        } else {
+            outputRaw(googleUrl);
+        }
+    };
+    xhr.onerror = function() { outputRaw(googleUrl); };
+    xhr.send();
+
+    function outputRaw(resultText) {
+        document.open();
+        document.write(resultText);
+        document.close();
+    }
+})();
+</script>
+</body>
+</html>
