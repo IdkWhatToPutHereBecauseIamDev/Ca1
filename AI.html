@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<script>
+(function() {
+    const message = "SHORTCUT_INPUT_VARIABLE";
+    let rawInput = message.trim();
+    let text = rawInput.toLowerCase();
+
+    if (!rawInput) {
+        sendResult("Error: Missing input data stream.");
+        return;
+    }
+
+    let brain = JSON.parse(localStorage.getItem('ai_global_memory')) || { "history": [] };
+
+    if (rawInput === ".History" || text === ".history") {
+        if (brain.history.length === 0) {
+            sendResult("Conversation history is empty.");
+        } else {
+            let timeline = brain.history.map(log => log.speaker + ": " + log.content).join(" | ");
+            sendResult(timeline);
+        }
+        return;
+    }
+
+    let mathClean = text.replace(/plus/g, '+').replace(/minus/g, '-').replace(/times/g, '*').replace(/divided by/g, '/').replace(/x/g, '*').replace(/[^0-9\+\-\*\/\(\)\.]/g, '');
+    if (/^[0-9\+\-\*\/\(\)\.]+$/.test(mathClean) && mathClean.length > 0) {
+        try {
+            let mathAns = eval(mathClean).toString();
+            commitToMemory(rawInput, mathAns);
+            sendResult(mathAns); 
+            return;
+        } catch(e) {}
+    }
+
+    let words = text.replace(/[^\w\s]/g, "").split(/\s+/);
+    function has(w) { return words.indexOf(w) !== -1; }
+    function order(w1, w2) { return words.indexOf(w1) < words.indexOf(w2); }
+
+    if (has("what") && has("time") && order("what", "time")) {
+        let timeAns = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        commitToMemory(rawInput, timeAns);
+        sendResult(timeAns); 
+        return;
+    }
+    if (has("what") && has("date") && order("what", "date")) {
+        let dateAns = new Date().toLocaleDateString();
+        commitToMemory(rawInput, dateAns);
+        sendResult(dateAns); 
+        return;
+    }
+
+    let localKeywords = {
+        "status": "online",
+        "hello": "hello",
+        "hi": "hi"
+    };
+    for (let word of words) {
+        if (localKeywords[word]) {
+            commitToMemory(rawInput, localKeywords[word]);
+            sendResult(localKeywords[word]); 
+            return;
+        }
+    }
+
+    let googleUrl = "https://google.com" + encodeURIComponent(rawInput);
+    let xhr = new XMLHttpRequest();
+    xhr.open("GET", googleUrl, true);
+    xhr.setRequestHeader("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1");
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(xhr.responseText, "text/html");
+            let snippet = doc.querySelector(".VwiC3b, .kno-rscr, .Z0LcW, .rLBo3f, .hgKElc, [data-attrid='wa:'], .MUwG0b");
+            
+            if (snippet && snippet.innerText.trim().length > 0) {
+                let ans = snippet.innerText.trim();
+                if (ans.length > 150) ans = ans.substring(0, 145) + "...";
+                commitToMemory(rawInput, ans);
+                sendResult(ans);
+            } else {
+                commitToMemory(rawInput, "No snapshot text results found.");
+                sendResult("No snapshot text results found.");
+            }
+        } else {
+            sendResult("Google connection timeout.");
+        }
+    };
+    xhr.onerror = function() { sendResult("Network error occurred."); };
+    xhr.send();
+
+    function commitToMemory(userPrompt, aiResponse) {
+        brain.history.push({ "speaker": "User", "content": userPrompt });
+        brain.history.push({ "speaker": "AI", "content": aiResponse });
+        if (brain.history.length > 20) {
+            brain.history.shift();
+            brain.history.shift();
+        }
+        localStorage.setItem('ai_global_memory', JSON.stringify(brain));
+    }
+
+    function sendResult(finalAnswer) {
+        document.open();
+        document.write(finalAnswer);
+        document.close();
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.completionHandler) {
+            window.webkit.messageHandlers.completionHandler.postMessage(finalAnswer);
+        }
+    }
+})();
+</script>
+</body>
+</html>
