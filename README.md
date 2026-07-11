@@ -2,8 +2,8 @@
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerLight.jpg">
-        <img src="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerDark.jpg" alt="Ca1 — Your personal AI assistant, running on your own devices.">
+        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerLight.png">
+        <img src="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerDark.png" alt="Ca1 — Your personal AI assistant, running on your own devices.">
     </picture>
 </p>
 
