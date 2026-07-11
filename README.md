@@ -8,8 +8,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/IdkWhatToPutHereBecauseIamDev/Ca1/releases">
-    <img src="https://img.shields.io/github/v/release/openclaw/openclaw?include_prereleases&style=for-the-badge" alt="GitHub release">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License">
