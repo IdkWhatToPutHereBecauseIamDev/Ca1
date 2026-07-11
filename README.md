@@ -2,8 +2,8 @@
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: light)" srcset="BANNER_LIGHT_URL_HERE">
-        <img src="BANNER_DARK_URL_HERE" alt="Ca1 — Your personal AI assistant, running on your own devices.">
+        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerLight.jpg">
+        <img src="https://raw.githubusercontent.com/IdkWhatToPutHereBecauseIamDev/Ca1/main/BannerDark.jpg" alt="Ca1 — Your personal AI assistant, running on your own devices.">
     </picture>
 </p>
 
