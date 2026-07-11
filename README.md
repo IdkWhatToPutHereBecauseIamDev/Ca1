@@ -32,16 +32,20 @@ No cloud. No external servers. Just a fast, personal assistant that feels like p
 | Instant Responses | Zero network delay — Ca1 answers immediately. |
 | Voice Support | Can speak and listen through macOS/iOS. |
 | Canvas Output | Supports a live Shortcut Canvas for visual responses. |
-| Command System | Built-in commands for debugging, history, and control. |
-| Single-User Design | Ca1 is meant to be your assistant — personal, private, and always-on. |
+| Single Command System | Only one built-in command: `.history`. |
+| Minimal Permissions | Only needs IP check (WiFi status), website access (AI code), and HTML rendering. |
 
 ---
 
-## ✦ Commands
+## ✦ Command
 
 | Command | Purpose |
 |---------|---------|
-| `.history` | Repeats your previous messages. Useful for debugging or recalling past interactions.
+| `.history` | Repeats your previous messages. Useful for debugging or recalling past interactions. |
+
+This is the **only** command Ca1 uses.
+
+---
 
 ## ✦ Installation
 
@@ -53,12 +57,13 @@ No cloud. No external servers. Just a fast, personal assistant that feels like p
    - Allow untrusted shortcuts if required  
    - Add Ca1 to your Dock, Menu Bar, or Automation triggers
 
-3. Grant Permissions  
-   Ca1 may request:  
-   - Speech recognition  
-   - Microphone access  
-   - File access  
-   - Running scripts
+3. Permissions  
+   Ca1 only requires:  
+   - **IP access** (to check WiFi status)  
+   - **Website access** (to load the AI’s code)  
+   - **HTML access** (for rendering output)  
+
+   No microphone, no speech recognition, no file access.
 
 4. Run Ca1  
    Trigger it from:  
