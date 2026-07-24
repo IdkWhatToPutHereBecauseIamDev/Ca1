@@ -50,8 +50,20 @@
 
 <script>
 (function() {
-    const params = new URLSearchParams(window.location.search);
-    const message = params.get('q') || "";
+    function getQueryParam(name) {
+        const query = window.location.search.substring(1);
+        const pairs = query.split('&');
+        for (const pair of pairs) {
+            const idx = pair.indexOf('=');
+            if (idx === -1) continue;
+            const key = decodeURIComponent(pair.substring(0, idx));
+            if (key === name) {
+                return decodeURIComponent(pair.substring(idx + 1));
+            }
+        }
+        return '';
+    }
+    const message = getQueryParam('q');
 
     if (!message.trim()) {
         document.getElementById("response-field").innerText = "Awaiting input...";
@@ -102,12 +114,12 @@
         return;
     }
 
-    if (text.includes("hello") || text.includes("hi") || text.includes("hey")) {
+    if (/\b(hello|hi|hey)\b/.test(text)) {
         commitToMemory(rawInput, "hello");
         renderUI("hello");
         return;
     }
-    if (text.includes("status")) {
+    if (/\bstatus\b/.test(text)) {
         commitToMemory(rawInput, "online");
         renderUI("online");
         return;
@@ -122,14 +134,23 @@
         try {
             let doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
             let snippet = doc.querySelector(".result__snippet");
+            let ans = "";
 
             if (snippet && snippet.innerText.trim().length > 0) {
-                let ans = snippet.innerText.trim();
+                ans = snippet.innerText.trim();
+            } else {
+                let topResult = doc.querySelector(".result__title") || doc.querySelector(".result");
+                if (topResult && topResult.innerText.trim().length > 0) {
+                    ans = topResult.innerText.trim();
+                }
+            }
+
+            if (ans.length > 0) {
                 if (ans.length > 150) ans = ans.substring(0, 145) + "...";
                 commitToMemory(rawInput, ans);
                 renderUI(ans);
             } else {
-                renderUI("No plain answer found.");
+                renderUI("No results found.");
             }
         } catch(e) {
             renderUI("Error decoding response.");
